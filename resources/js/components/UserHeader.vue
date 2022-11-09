@@ -128,10 +128,10 @@ export default {
 
     const resetForm = () => {
       // reset form data
-      formData.name = "";
-      formData.email = "";
-      formData.location = "";
-      formData.phone = "";
+      formData.value.name = "";
+      formData.value.email = "";
+      formData.value.location = "";
+      formData.value.phone = "";
     };
     const formData = ref({
       name: "",

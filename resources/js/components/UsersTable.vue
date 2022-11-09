@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         <tr v-for="(user, index) in users" :key="index">
-          <th scope="row">1</th>
+          <th scope="row">{{ user.id }}</th>
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.location }}</td>
