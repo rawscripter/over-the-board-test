@@ -6,7 +6,11 @@
           @searchUser="searchUser"
           @createNewUser="createNewUser"
         ></UserHeader>
-        <UsersTable @deleteUser="deleteUser" :users="usersList"></UsersTable>
+        <UsersTable
+          @updateUser="updateUser"
+          @deleteUser="deleteUser"
+          :users="usersList"
+        ></UsersTable>
       </div>
     </div>
   </div>
@@ -77,11 +81,20 @@ export default {
       console.log(usersList.value);
       alert("User created successfully");
     };
+    const updateUser = (formData) => {
+      // update user
+      const index = usersList.value.findIndex(
+        (user) => user.id === formData.value.id
+      );
+      usersList.value[index] = formData.value;
+      alert("User updated successfully");
+    };
     return {
       usersList,
       deleteUser,
       searchUser,
       createNewUser,
+      updateUser,
     };
   },
 };

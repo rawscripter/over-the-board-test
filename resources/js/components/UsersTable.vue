@@ -25,47 +25,142 @@
           <td>{{ user.location }}</td>
           <td>{{ user.phone }}</td>
           <td>
+            <span class="btn text-info" @click="openUserEditModal(user.id)">
+              Edit
+            </span>
             <span class="btn text-danger" @click="deleteUser(user.id)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-trash"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"
-                />
-                <path
-                  fill-rule="evenodd"
-                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
-                />
-              </svg>
+              Delete
             </span>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <div
+    class="modal fade"
+    :class="{ show: showUserEditModal }"
+    id="CreateUser"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Update User</h5>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="updateUser">
+            <div class="form-group">
+              <label for="">Name</label>
+              <input
+                type="text"
+                v-model="formData.name"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <label for="">Email</label>
+              <input
+                type="email"
+                v-model="formData.email"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <label for="">Location</label>
+              <input
+                type="text"
+                v-model="formData.location"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <label for="">Phone</label>
+              <input
+                type="text"
+                v-model="formData.phone"
+                required
+                class="form-control"
+              />
+            </div>
+
+            <div class="mt-3 d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-danger btn-block"
+                data-dismiss="modal"
+                @click="closeUserEditModal"
+              >
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Save changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
+import { ref } from "vue";
 export default {
-  name: "UsersTable",
   props: {
     users: {
       type: Array,
       required: true,
     },
   },
-  methods: {
-    deleteUser(id) {
-      const confirm = window.confirm("Are you sure?");
-      if (confirm) {
-        this.$emit("deleteUser", id);
-      }
-    },
+  setup(props, { emit }) {
+    const showUserEditModal = ref(false);
+
+    const formData = ref({
+      name: "",
+      email: "",
+      location: "",
+      phone: "",
+    });
+
+    const closeUserEditModal = () => {
+      showUserEditModal.value = false;
+    };
+
+    const openUserEditModal = (userId) => {
+      const user = props.users.find((user) => user.id === userId);
+      formData.value = { ...user };
+      showUserEditModal.value = true;
+    };
+
+    const updateUser = () => {
+      emit("updateUser", formData);
+      closeUserEditModal();
+    };
+
+    const deleteUser = (id) => {
+      emit("deleteUser", id);
+    };
+
+    return {
+      showUserEditModal,
+      formData,
+      closeUserEditModal,
+      openUserEditModal,
+      updateUser,
+      deleteUser,
+    };
   },
 };
 </script>
+<style scoped>
+.show {
+  display: block !important;
+}
+</style>
