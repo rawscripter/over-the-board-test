@@ -58,6 +58,11 @@ class UserController extends Controller
     }
     public function search($query)
     {
+        $query  = urldecode($query);
+        // if the query is empty, return all users
+        if ($query == '') {
+            return UserResource::collection(User::all());
+        }
         // search name or email or phone
         $users = User::where('name', 'like', '%' . $query . '%')
             ->orWhere('email', 'like', '%' . $query . '%')
