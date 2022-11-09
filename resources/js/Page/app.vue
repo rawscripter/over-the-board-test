@@ -7,6 +7,7 @@
           @createNewUser="createNewUser"
         ></UserHeader>
         <UsersTable
+          :isLoading="isLoading"
           @updateUser="updateUser"
           @deleteUser="deleteUser"
           :users="usersList"
@@ -20,7 +21,7 @@
 <script>
 import UsersTable from "@/components/UsersTable.vue";
 import UserHeader from "@/components/UserHeader.vue";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 export default {
   name: "App",
   components: {
@@ -28,73 +29,74 @@ export default {
     UserHeader,
   },
   setup() {
-    const usersList = ref([
-      {
-        id: 1,
-        name: "John Doe",
-        email: "abc@gmail.com",
-        location: "Bangladesh",
-        phone: "01700000000",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "abc@gmail.com",
-        location: "Bangladesh",
-        phone: "01700000000",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "abc@gmail.com",
-        location: "Bangladesh",
-        phone: "01700000000",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "abc@gmail.com",
-        location: "Bangladesh",
-        phone: "01700000000",
-      },
-    ]);
-
-    const deleteUser = (id) => {
-      const index = usersList.value.findIndex((user) => user.id === id);
-      usersList.value.splice(index, 1);
-      alert("User deleted successfully");
+    const usersList = ref([]);
+    const isLoading = ref(false);
+    const fetchUsers = async () => {
+      try {
+        isLoading.value = true;
+        const response = await axios.get("/api/users");
+        usersList.value = response.data.data;
+      } catch (err) {
+        // alert("Something went wrong.Please try again");
+      } finally {
+        isLoading.value = false;
+      }
     };
-
-    const searchUser = (searchText) => {
-      // search user with name or email
-      const searchResult = usersList.value.filter((user) => {
-        return (
-          user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchText.toLowerCase())
+    const searchUser = async (searchText) => {
+      try {
+        isLoading.value = true;
+        const response = await axios.get(`/api/users/search/${searchText}`);
+        usersList.value = response.data.data;
+      } catch (err) {
+        // alert("Something went wrong.Please try again");
+      } finally {
+        isLoading.value = false;
+      }
+    };
+    const createNewUser = async (formData) => {
+      try {
+        const res = await axios.post("/api/users", formData);
+        usersList.value.push(res.data.data);
+        alert("User created successfully");
+      } catch (err) {
+        alert("Something went wrong.Please try again");
+      }
+    };
+    const updateUser = async (formData) => {
+      try {
+        const res = await axios.put(
+          `/api/users/${formData.value.id}`,
+          formData.value
         );
-      });
-      usersList.value = searchResult;
+        const index = usersList.value.findIndex(
+          (user) => user.id === formData.value.id
+        );
+        usersList.value[index] = res.data.data;
+        alert("User updated successfully");
+      } catch (err) {
+        alert("Something went wrong.Please try again");
+      }
     };
-    const createNewUser = (formData) => {
-      // create new user
-      usersList.value.push(formData);
-      console.log(usersList.value);
-      alert("User created successfully");
+
+    const deleteUser = async (id) => {
+      try {
+        const res = await axios.delete(`/api/users/${id}`);
+        usersList.value = usersList.value.filter((user) => user.id !== id);
+        alert("User deleted successfully");
+      } catch (err) {
+        alert("Something went wrong.Please try again");
+      }
     };
-    const updateUser = (formData) => {
-      // update user
-      const index = usersList.value.findIndex(
-        (user) => user.id === formData.value.id
-      );
-      usersList.value[index] = formData.value;
-      alert("User updated successfully");
-    };
+
+    // fetch users on component mounted
+    onMounted(fetchUsers);
     return {
       usersList,
       deleteUser,
       searchUser,
       createNewUser,
       updateUser,
+      isLoading,
     };
   },
 };

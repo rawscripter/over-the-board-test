@@ -10,7 +10,7 @@
             placeholder="Search user"
             aria-label="Search user"
             aria-describedby="button-addon2"
-            @keypress="searchUser"
+            @keyup="searchUser"
           />
         </div>
       </div>

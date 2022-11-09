@@ -1,6 +1,6 @@
 <template>
-  <div class="table-responsive">
-    <table class="table">
+  <div class="table-responsive" v-if="!isLoading">
+    <table class="table" v-if="users.length > 0">
       <caption>
         Total Users:
         {{
@@ -35,7 +35,11 @@
         </tr>
       </tbody>
     </table>
+    <div v-else>
+      <h3 class="text-center mt-3 text-muted">No users found</h3>
+    </div>
   </div>
+  <div class="text-center mt-3" v-else>Loading...</div>
 
   <div
     class="modal fade"
@@ -118,6 +122,10 @@ export default {
       type: Array,
       required: true,
     },
+    isLoading: {
+      type: Boolean,
+      required: true,
+    },
   },
   setup(props, { emit }) {
     const showUserEditModal = ref(false);
@@ -145,7 +153,12 @@ export default {
     };
 
     const deleteUser = (id) => {
-      emit("deleteUser", id);
+      const confirm = window.confirm(
+        "Are you sure you want to delete this user?"
+      );
+      if (confirm) {
+        emit("deleteUser", id);
+      }
     };
 
     return {
